@@ -30,6 +30,7 @@ Each animation has some variables to process it and to get/change information ab
 * `anim.frame` = Current frame number
 * `anim.frames` = Frame set
     * `anim.frames.n` = frame set size (faster than `#anim.frames`)
+    * `anim.frames.dur` = full animation duration (faster than anim.frames.n * anim.speed)
 * `anim.time` = Time passed after the first frame was shown
 * `anim.isLooping` = If the animation is looping (starts again after it has finished)
 * `anim.isPlaying` = If the animation is playing

@@ -2,23 +2,25 @@ local BASE = (...):match('(.-)[^%.]+$')
 local post8 = love.graphics.getDefaultFilter ~= nil
 
 local frame_aliases = {'drawable', 'x', 'y', 'r', 'sx', 'sy', 'ox', 'oy', 'kx', 'ky'}
-local frame_defaults = {'', 0, 0, 0, 1, 1, 0, 0, 0, 0}
 local frame_mt = {
   __index = function(t, k)
-    if type(k) == 'string' then
+    if k == 5 then
+      return rawget(t, 5) or 1
+    elseif k == 6 then
+      return rawget(t, 6) or rawget(t, 5) or 1
+    elseif type(k) == 'string' then
       for i = 1, 10 do
-        if i ~= 6 and k == frame_aliases[i] then
-          return t[i] or frame_defaults[i]
+        if k == frame_aliases[i] and i ~= 5 and i ~= 6 then
+          return t[i] or 0
         end
       end
-      if k == 'sy' then
-        return rawget(t, 6) or t[5]
+      if k == 'sx' then
+        return rawget(t, 5) or 1
+      elseif k == 'sy' then
+        return rawget(t, 6) or rawget(t, 5) or 1
       end
     end
-    if k == 6 then
-      return rawget(t, 6) or t[5]
-    end
-    return rawget(t, k) or frame_defaults[k]
+    return rawget(t, k) or 0
   end,
   __newindex = function(t, k, v)
     if type(k) == 'string' then
@@ -54,7 +56,7 @@ local function newAnim(set, speed, isLooping, playNow, startFrame, filterMode) -
   end
 
   local anim = {
-    frames = {n = 0},
+    frames = {n = 0, dur = 0},
     isLooping = isLooping,
     frame = startFrame,
     time = 0,
@@ -85,23 +87,8 @@ local function newAnim(set, speed, isLooping, playNow, startFrame, filterMode) -
     end
     
     anim.frames.n = anim.frames.n + 1
+    anim.frames.dur = anim.frames.dur + anim.speed
   end
-  setmetatable(anim.frames, {
-    __newindex = function(t, k, v)
-      if k ~= 'n' then
-        if t[k] == nil then
-          if v ~= nil then
-            rawset(t, 'n', t.n + 1)
-          end
-        else
-          if v == nil then
-            rawset(t, 'n', t.n - 1)
-          end
-        end
-        rawset(t, k, v)
-      end
-    end
-  })
   
   anim.time = li.getDuration(anim, anim.frame)
   
@@ -119,13 +106,12 @@ function li.__newindex(t, k, v)
     else
       t:stop()
     end
-  elseif k == 'frame' then
-    rawset(t, "time", t:getDuration(v))
-    rawset(t, k, v)
-  elseif k == 'time' then
-    rawset(t, "frame", t:getFrameByTime(v))
-    rawset(t, k, v)
   else
+    if k == 'frame' then
+      rawset(t, "time", t:getDuration(v))
+    elseif k == 'time' then
+      rawset(t, "frame", t:getFrameByTime(v))
+     end 
   rawset(t, k, v)
   end
 end
@@ -144,8 +130,6 @@ end
 
 
 function li:getFrameByTime(time, from)
-  local animLen = self.frames.n
-  local animDur = animLen * self.speed
   
   if from then
     time = time + self:getDuration(from)
@@ -153,24 +137,26 @@ function li:getFrameByTime(time, from)
   
   if self.isLooping then
     if time < 0 then
-      time = time - math.min(math.floor(time / animDur), -1) * animDur
+      time = time - math.min(math.floor(time / self.frames.dur), -1) * self.frames.dur
     end
   else
-    time = math.max(math.min(time, animDur - self.speed), 0)
+    time = math.max(math.min(time, self.frames.dur - self.speed), 0)
   end
-  return (math.floor(time / self.speed) % animLen) + 1
+  return (math.floor(time / self.speed) % self.frames.n) + 1
 end
 
 function li:update(dt)
+  self.frames.n = #self.frames
+  self.frames.dur = self.frames.n * self.speed
+  
   if self.isPlaying then
-    local animDur = self.frames.n * self.speed
     self.time = self.time + dt
-    if self.time >= animDur then
+    if self.time >= self.frames.dur then
       if self.isLooping then
-        rawset(self, "time", self.time - math.floor(self.time / animDur) * animDur)
+        rawset(self, "time", self.time - math.floor(self.time / self.frames.dur) * self.frames.dur)
       else
-        rawset(self, "time", animDur)
-        self.isPlaying = false
+        rawset(self, "time", self.frames.dur)
+        self:stop()
       end
     end
   end
@@ -210,13 +196,12 @@ end
 function li:draw(...)
   local frame = self:getCurrentFrame()
   local args = {frame[1], ...}
-  local letters = {'x', 'y'}
   
   for i = 2, 10 do
     if i < 5 or i > 6 then
-      args[i] = args[i] or frame_defaults[i] + frame[i]
+      args[i] = args[i] or 0 + frame[i]
     else
-      args[i] = args[i] or frame_defaults[i] * frame[i]
+      args[i] = args[i] or 1 * frame[i]
     end
   end
 

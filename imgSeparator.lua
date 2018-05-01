@@ -14,15 +14,7 @@ function isep.crop(img, sx, sy, sw, sh, convert)--img = input imageData, convert
   assert(t == "ImageData", "ImageData or string expected, got " .. t)
   
   local returned = love.image.newImageData(sw, sh)
-  local function f(x, y, r, g, b, a)
-    x = x + sx
-    y = y + sy
-    if x > img:getWidth() - 1 or y > img:getHeight() - 1 then
-      return 0, 0, 0, 0
-    end
-    return img:getPixel(x, y)
-  end
-  returned:mapPixel(f)
+  returned:paste(img,0, 0, sx, sy, sw, sh)
   
   if convert then
     return love.graphics.newImage(returned)
