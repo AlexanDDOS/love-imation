@@ -27,7 +27,7 @@ While the initalization, frame table can be generated from a drawable object or 
 Each animation has some variables to process it and to get/change information about it.  
 * `anim.frame` = Current frame number
 * `anim.frames` = Frame set
-    * `anim.frames.n` = frame set size (faster than #anim.frames)
+    * `anim.frames.n` = frame set size (faster than `#anim.frames`)
 * `anim.time` = Time passed after the first frame was shown
 * `anim.isLooping` = If the animation is looping (starts again after it has finished)
 * `anim.isPlaying` = If the animation is playing
