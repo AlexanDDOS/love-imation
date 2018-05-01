@@ -1,37 +1,26 @@
 local BASE = (...):match('(.-)[^%.]+$')
 local post8 = love.graphics.getDefaultFilter ~= nil
 
-local frame_aliases = {'drawable', 'x', 'y', 'r', 'sx', 'sy', 'ox', 'oy', 'kx', 'ky'}
+local frame_alias = {drawable = 1, x = 2, y = 3, r = 4, sx = 5, sy = 6, ox = 7, oy = 8, kx = 9, ky = 10}
+
 local frame_mt = {
   __index = function(t, k)
-    if k == 5 then
-      return rawget(t, 5) or 1
-    elseif k == 6 then
-      return rawget(t, 6) or rawget(t, 5) or 1
-    elseif type(k) == 'string' then
-      for i = 1, 10 do
-        if k == frame_aliases[i] and i ~= 5 and i ~= 6 then
-          return t[i] or 0
-        end
-      end
-      if k == 'sx' then
-        return rawget(t, 5) or 1
-      elseif k == 'sy' then
-        return rawget(t, 6) or rawget(t, 5) or 1
+    local r = rawget(t, k)
+    if r == nil then
+      k = frame_alias[k] or tonumber(k)
+      r = rawget(t, k)
+      if k == 6 then
+        r = r or rawget(t, 5) or 1
+      elseif k == 5 then
+        r = r or 1
+      elseif k then
+        r = r or 0
       end
     end
-    return rawget(t, k) or 0
+    return r
   end,
   __newindex = function(t, k, v)
-    if type(k) == 'string' then
-      for i = 1, 10 do
-        if k == frame_aliases[i] then
-          t[i] = v
-          return nil
-        end
-      end
-    end
-    rawset(t, k, v)
+    rawset(t, frame_alias[k] or k, v)
   end
 }
 
