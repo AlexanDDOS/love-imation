@@ -49,5 +49,5 @@ You can also draw correctly the current frame with an additional transform by ca
 # Which LÖVE versions support the library?
 The library are tested in LÖVE 11.1, but you probably can use it in any version of LÖVE.
 
-# Under what the librry is licensed?
+# Under what the library is licensed?
 It's licensed under the MIT/X11 license (see [LICENSE](https://raw.githubusercontent.com/AlexanDDOS/love-imation/master/LICENSE)).
