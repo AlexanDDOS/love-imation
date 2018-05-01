@@ -1,6 +1,6 @@
 # What is Love-Imation?
 **"Love-Imation"** is an animation library written for [the LÖVE engine](https://love2d.org).  
-It helps to make animations with constant framerate of sprites (or any other drawable LÖVE objects), even if the sprites are merged into one spritesheet (by a special sub-module).
+It helps to make animations with constant framerate of sprites (or any other drawable LÖVE objects), even if the sprites are merged into one spritesheet (by separating it by a special sub-module).
 
 # How does it work?
 *Note: a reference to the library and an example animation are repectively named* `li` *and* `anim` *in the below text.*  
