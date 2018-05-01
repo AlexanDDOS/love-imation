@@ -15,13 +15,15 @@ Firstly, you need to initialize an new animation table. You can do it by calling
 ## Frame and frame set tables 
 Animation frame set is stored in the array-like order (i.e. with integer ordered keys). After the initialzation, you can also get the table's size by the key `'n'`.  
 After the initalization, each frame set table value must be a frame table standing for arguments for `love.grpahics.draw(...)`. The arguments can be assinged by either their order number or their interal names according to [this LÖVE wiki page](https://love2d.org/wiki/love.graphics.draw). After it, the table also has a special metatable returning default values instead of non-setted and binding the string keys to the number ones.
-While the initalization, frame table can be generated from a drawable object or a string with a filepath to an image.
-    anim1 = li.newAnimation({"frame1.png", "frame2.png"}, 1 / 30)
-    anim2 = li.newAnimation({
-      {love.graphics.newImage("frame1.png")},
-      {love.graphics.newImage("frame2.png")}
-    }, 1 / 30)
-    --In fact, anim1 is equal to anim2 
+While the initalization, frame table can be generated from a drawable object or a string with a filepath to an image.  
+```Lua
+anim1 = li.newAnimation({"frame1.png", "frame2.png"}, 1 / 30)
+anim2 = li.newAnimation({
+  {love.graphics.newImage("frame1.png")},
+  {love.graphics.newImage("frame2.png")}
+}, 1 / 30)
+--In fact, anim1 is equal to anim2 
+ ```
     
 ## Propeties
 Each animation has some variables to process it and to get/change information about it.  
