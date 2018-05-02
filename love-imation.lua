@@ -7,14 +7,10 @@ local frame_mt = {
   __index = function(t, k)
     local r = rawget(t, k)
     if r == nil then
-      k = frame_alias[k] or tonumber(k)
+      k = frame_alias[k] or k
       r = rawget(t, k)
       if k == 6 then
-        r = r or rawget(t, 5) or 1
-      elseif k == 5 then
-        r = r or 1
-      elseif k then
-        r = r or 0
+        r = r or rawget(t, 5)
       end
     end
     return r
@@ -188,9 +184,9 @@ function li:draw(...)
   
   for i = 2, 10 do
     if i < 5 or i > 6 then
-      args[i] = args[i] or 0 + frame[i]
+      args[i] = (args[i] or 0) + (frame[i] or 0)
     else
-      args[i] = args[i] or 1 * frame[i]
+      args[i] = (args[i] or 1) * (frame[i] or 1)
     end
   end
 
