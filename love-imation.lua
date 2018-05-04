@@ -44,6 +44,7 @@ local function newAnim(set, speed, isLooping, playNow, startFrame, filterMode) -
     frames = {n = 0, dur = 0},
     isLooping = isLooping,
     frame = startFrame,
+    lastFrame = startFrame,
     time = 0,
     speed = speed
   }
@@ -131,18 +132,23 @@ function li:update(dt)
   self.frames.n = #self.frames
   self.frames.dur = self.frames.n * self.speed
   
+  if self.lastFrame ~= self.frame then
+    self.time = self:getDuration(self.frame)
+  end
+  
+  if not self.isLooping and self.time >= self.frames.dur then
+    self.time = self.frames.dur
+    self:stop()
+  end
+  
   if self.isPlaying then
     self.time = self.time + dt
-    if self.time >= self.frames.dur then
-      if self.isLooping then
-        rawset(self, "time", self.time - math.floor(self.time / self.frames.dur) * self.frames.dur)
-      else
-        rawset(self, "time", self.frames.dur)
-        self:stop()
-      end
+    if self.time >= self.frames.dur and self.isLooping then
+      self.time = self.time - math.floor(self.time / self.frames.dur) * self.frames.dur
     end
   end
-  rawset(self, "frame", self:getFrameByTime(self.time))
+  self.lastFrame = self.frame
+  self.frame = self:getFrameByTime(self.time)
 end
 
 function li:play(...)
