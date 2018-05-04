@@ -45,7 +45,6 @@ local function newAnim(set, speed, isLooping, playNow, startFrame, filterMode) -
     isLooping = isLooping,
     frame = startFrame,
     time = 0,
-    isPlaying = playNow,
     speed = speed
   }
   
@@ -73,11 +72,15 @@ local function newAnim(set, speed, isLooping, playNow, startFrame, filterMode) -
     
     anim.frames.n = anim.frames.n + 1
     anim.frames.dur = anim.frames.dur + anim.speed
+    
   end
   
-  anim.time = li.getDuration(anim, anim.frame)
+  setmetatable(anim, li)
   
-  return setmetatable(anim, li)
+  anim.isPlaying = playNow
+  anim.time = anim:getDuration(anim.frame)
+  
+  return anim
 end
 
 function li.__index(t, k)
@@ -91,13 +94,6 @@ function li.__newindex(t, k, v)
     else
       t:stop()
     end
-  else
-    if k == 'frame' then
-      rawset(t, "time", t:getDuration(v))
-    elseif k == 'time' then
-      rawset(t, "frame", t:getFrameByTime(v))
-     end 
-  rawset(t, k, v)
   end
 end
 
@@ -105,12 +101,13 @@ function li:getDuration(to, from) --Get duration from the frame 'from' to the fr
   from = from or 1
   to = to or self.frames.n
   
+  
   if not self.isLooping then
     from = math.max(math.min(from, self.frames.n), 1)
     to = math.max(math.min(to, self.frames.n), 1)
   end
   
-  return (from - to) * self.speed --If to > from, returned value is negative
+  return (to - from) * self.speed --If to > from, returned value is negative
 end
 
 
